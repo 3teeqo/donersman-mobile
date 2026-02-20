@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
-import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'expo-router';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -10,15 +11,19 @@ import {
   Keyboard,
   Modal,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View
 } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { useAppTheme } from '../contexts/AppThemeContext';
 
 const LocationServices = () => {
+  const router = useRouter();
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -252,26 +257,42 @@ const LocationServices = () => {
   };
 
   if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#e67e22" />
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.accent} />
         <Text style={styles.loadingText}>Loading your addresses...</Text>
       </View>
     );
   }
 
-  return (
-    <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.container}>
-          <ScrollView style={styles.scrollView}>
-            {/* Header */}
-            <View style={styles.header}>
-              <View>
-                <Text style={styles.title}>Delivery Addresses</Text>
-                <Text style={styles.subtitle}>Manage your delivery locations</Text>
-              </View>
-              <View style={styles.headerStats}>
+    return (
+      <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <View style={styles.container}>
+            <ScrollView style={styles.scrollView}>
+              {/* Header */}
+              <View style={styles.header}>
+                <View style={styles.headerTopRow}>
+                  <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => {
+                      if (router.canGoBack?.()) {
+                        router.back();
+                      } else {
+                        router.push('/');
+                      }
+                    }}
+                    accessibilityLabel="Go back"
+                    accessibilityRole="button"
+                  >
+                    <Text style={styles.backButtonText}>‹</Text>
+                  </TouchableOpacity>
+                  <View style={styles.headerTitleBlock}>
+                    <Text style={styles.title}>Delivery Addresses</Text>
+                    <Text style={styles.subtitle}>Manage your delivery locations</Text>
+                  </View>
+                </View>
+                <View style={styles.headerStats}>
                 <Text style={styles.addressCount}>{addresses.length} addresses</Text>
                 {selectedAddress && (
                   <Text style={styles.selectedText}>📍 {selectedAddress.name} selected</Text>
@@ -287,9 +308,9 @@ const LocationServices = () => {
                 onPress={getCurrentLocation}
                 disabled={locationLoading}
               >
-                {locationLoading ? (
-                  <View style={styles.locationLoading}>
-                    <ActivityIndicator size="small" color="#4CAF50" />
+                  {locationLoading ? (
+                    <View style={styles.locationLoading}>
+                      <ActivityIndicator size="small" color={colors.accent} />
                     <Text style={styles.locationLoadingText}>Detecting your location...</Text>
                   </View>
                 ) : (
@@ -618,56 +639,74 @@ const LocationServices = () => {
       </TouchableWithoutFeedback>
     </Animated.View>
   )
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff4e6',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff4e6',
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#666',
-  },
+  }
+  
+const createStyles = (colors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: colors.background,
+    },
+    loadingText: {
+      marginTop: 10,
+      fontSize: 16,
+      color: colors.textSecondary,
+    },
   scrollView: {
     flex: 1,
   },
-  header: {
-    padding: 20,
-    paddingTop: 60,
-    backgroundColor: '#ffcc80',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#7d2e14',
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#7d2e14',
-    opacity: 0.8,
-  },
+    header: {
+      padding: 20,
+      paddingTop: 60,
+      backgroundColor: colors.heroBackground,
+    },
+    headerTopRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      gap: 12,
+    },
+    backButton: {
+      padding: 8,
+      borderRadius: 999,
+      backgroundColor: colors.heroOverlay,
+    },
+    backButtonText: {
+      fontSize: 18,
+      color: colors.textPrimary,
+      fontWeight: '600',
+    },
+    headerTitleBlock: {
+      flex: 1,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.textPrimary,
+      marginBottom: 4,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: colors.textSecondary,
+    },
   headerStats: {
     marginTop: 8,
   },
-  addressCount: {
-    fontSize: 14,
-    color: '#7d2e14',
-    fontWeight: '600',
-  },
-  selectedText: {
-    fontSize: 12,
-    color: '#7d2e14',
-    opacity: 0.8,
-  },
+    addressCount: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      fontWeight: '600',
+    },
+    selectedText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
   section: {
     margin: 16,
     marginTop: 20,
@@ -678,41 +717,41 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 16,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  sectionSubtitle: {
-    fontSize: 14,
-    color: '#666',
-  },
-  addButton: {
-    backgroundColor: '#e67e22',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  addButtonIcon: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginRight: 6,
-  },
-  addButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  currentLocationCard: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: '#4CAF50',
+    sectionTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.textPrimary,
+      marginBottom: 4,
+    },
+    sectionSubtitle: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+    addButton: {
+      backgroundColor: colors.accent,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      borderRadius: 20,
+    },
+    addButtonIcon: {
+      color: colors.accentText,
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginRight: 6,
+    },
+    addButtonText: {
+      color: colors.accentText,
+      fontSize: 14,
+      fontWeight: '600',
+    },
+    currentLocationCard: {
+      backgroundColor: colors.surface,
+      padding: 20,
+      borderRadius: 16,
+      borderWidth: 2,
+      borderColor: colors.accent,
     borderStyle: 'dashed',
     elevation: 2,
     shadowColor: '#000',
@@ -725,98 +764,98 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  locationLoadingText: {
-    marginLeft: 12,
-    fontSize: 16,
-    color: '#4CAF50',
-    fontWeight: '600',
-  },
-  currentLocationText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#4CAF50',
-    marginBottom: 8,
-  },
-  currentLocationSubtext: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-    lineHeight: 20,
-  },
+    locationLoadingText: {
+      marginLeft: 12,
+      fontSize: 16,
+      color: colors.accent,
+      fontWeight: '600',
+    },
+    currentLocationText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.accent,
+      marginBottom: 8,
+    },
+    currentLocationSubtext: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginBottom: 12,
+      lineHeight: 20,
+    },
   locationFeatures: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
   },
-  locationFeature: {
-    fontSize: 12,
-    color: '#4CAF50',
-    backgroundColor: '#f0f9f0',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  emptyState: {
-    backgroundColor: 'white',
-    padding: 40,
-    borderRadius: 16,
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
+    locationFeature: {
+      fontSize: 12,
+      color: colors.accent,
+      backgroundColor: colors.accentSoft,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 12,
+      overflow: 'hidden',
+    },
+    emptyState: {
+      backgroundColor: colors.surface,
+      padding: 40,
+      borderRadius: 16,
+      alignItems: 'center',
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
   emptyStateEmoji: {
     fontSize: 48,
     marginBottom: 16,
   },
-  emptyStateTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  emptyStateText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 20,
-    lineHeight: 20,
-  },
-  emptyStateButton: {
-    backgroundColor: '#e67e22',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  emptyStateButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  addressCard: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 12,
-    borderWidth: 2,
-    borderColor: '#e0e0e0',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  selectedAddress: {
-    borderColor: '#e67e22',
-    backgroundColor: '#fff8f0',
-  },
-  currentLocationAddress: {
-    borderColor: '#4CAF50',
-    backgroundColor: '#f0f9f0',
-  },
+    emptyStateTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.textPrimary,
+      marginBottom: 8,
+    },
+    emptyStateText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: 20,
+      lineHeight: 20,
+    },
+    emptyStateButton: {
+      backgroundColor: colors.accent,
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      borderRadius: 12,
+    },
+    emptyStateButtonText: {
+      color: colors.accentText,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    addressCard: {
+      backgroundColor: colors.surface,
+      padding: 20,
+      borderRadius: 16,
+      marginBottom: 12,
+      borderWidth: 2,
+      borderColor: colors.borderMuted,
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
+    selectedAddress: {
+      borderColor: colors.accent,
+      backgroundColor: colors.accentSoft,
+    },
+    currentLocationAddress: {
+      borderColor: colors.accent,
+      backgroundColor: colors.accentSoft,
+    },
   addressHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -832,28 +871,28 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginRight: 12,
   },
-  addressType: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  defaultBadge: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
+    addressType: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: colors.textPrimary,
+      marginBottom: 4,
+    },
+    defaultBadge: {
+      backgroundColor: colors.accent,
+      color: colors.accentText,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 8,
     fontSize: 10,
     fontWeight: 'bold',
     alignSelf: 'flex-start',
   },
-  currentLocationBadge: {
-    backgroundColor: '#2196F3',
-    color: 'white',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
+    currentLocationBadge: {
+      backgroundColor: colors.highlight,
+      color: colors.highlightText,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 8,
     fontSize: 10,
     fontWeight: 'bold',
     alignSelf: 'flex-start',
@@ -862,18 +901,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  setDefaultBtn: {
-    backgroundColor: '#f0f0f0',
+    setDefaultBtn: {
+      backgroundColor: colors.surfaceMuted,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
     marginRight: 8,
   },
-  setDefaultText: {
-    fontSize: 12,
-    color: '#666',
-    fontWeight: '600',
-  },
+    setDefaultText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      fontWeight: '600',
+    },
   editBtn: {
     padding: 6,
     marginRight: 8,
@@ -887,56 +926,56 @@ const styles = StyleSheet.create({
   deleteText: {
     fontSize: 16,
   },
-  addressName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  addressText: {
-    fontSize: 16,
-    color: '#666',
-    lineHeight: 22,
-    marginBottom: 4,
-  },
+    addressName: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.textPrimary,
+      marginBottom: 8,
+    },
+    addressText: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      lineHeight: 22,
+      marginBottom: 4,
+    },
   addressDetails: {
     fontSize: 14,
     color: '#999',
     fontStyle: 'italic',
     marginTop: 4,
   },
-  coordinates: {
-    marginTop: 8,
-    padding: 8,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-  },
-  coordinatesText: {
-    fontSize: 12,
-    color: '#666',
-    fontFamily: 'monospace',
-  },
-  selectedIndicator: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#e67e22',
-  },
-  deliveryEstimate: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
-  },
-  infoCard: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 16,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
+    coordinates: {
+      marginTop: 8,
+      padding: 8,
+      backgroundColor: colors.surfaceMuted,
+      borderRadius: 8,
+    },
+    coordinatesText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      fontFamily: 'monospace',
+    },
+    selectedIndicator: {
+      marginTop: 12,
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.accent,
+    },
+    deliveryEstimate: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginTop: 4,
+    },
+    infoCard: {
+      backgroundColor: colors.surface,
+      padding: 20,
+      borderRadius: 16,
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
   infoItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -946,18 +985,18 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginRight: 16,
   },
-  infoTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 2,
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  trackingCard: {
-    backgroundColor: 'white',
+    infoTitle: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: colors.textPrimary,
+      marginBottom: 2,
+    },
+    infoText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+    trackingCard: {
+      backgroundColor: colors.surface,
     padding: 20,
     borderRadius: 16,
     borderLeftWidth: 4,
@@ -968,18 +1007,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
-  trackingTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  trackingText: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 20,
-    lineHeight: 20,
-  },
+    trackingTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.textPrimary,
+      marginBottom: 8,
+    },
+    trackingText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginBottom: 20,
+      lineHeight: 20,
+    },
   trackingSteps: {
     gap: 16,
   },
@@ -998,16 +1037,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginRight: 16,
   },
-  stepTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 2,
-  },
-  stepDescription: {
-    fontSize: 14,
-    color: '#666',
-  },
+    stepTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: 2,
+    },
+    stepDescription: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
   footerSpacer: {
     height: 40,
   },
@@ -1019,45 +1058,45 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modalContent: {
-    backgroundColor: 'white',
-    margin: 20,
-    borderRadius: 20,
-    padding: 24,
-    maxHeight: '80%',
-    width: '90%',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-  },
+    modalContent: {
+      backgroundColor: colors.surface,
+      margin: 20,
+      borderRadius: 20,
+      padding: 24,
+      maxHeight: '80%',
+      width: '90%',
+      elevation: 5,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+    },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 24,
   },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-  },
+    modalTitle: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      color: colors.textPrimary,
+    },
   closeModalButton: {
     padding: 8,
   },
-  closeModalText: {
-    fontSize: 20,
-    color: '#666',
-    fontWeight: 'bold',
-  },
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-    marginTop: 16,
-  },
+    closeModalText: {
+      fontSize: 20,
+      color: colors.textSecondary,
+      fontWeight: 'bold',
+    },
+    inputLabel: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: 8,
+      marginTop: 16,
+    },
   required: {
     color: '#e74c3c',
   },
@@ -1066,41 +1105,41 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 16,
   },
-  typeButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  selectedType: {
-    backgroundColor: '#fff8f0',
-  },
+    typeButton: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 16,
+      backgroundColor: colors.surfaceMuted,
+      borderRadius: 12,
+      borderWidth: 2,
+      borderColor: 'transparent',
+    },
+    selectedType: {
+      backgroundColor: colors.accentSoft,
+    },
   typeIcon: {
     fontSize: 20,
     marginRight: 8,
   },
-  typeText: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '600',
-  },
-  selectedTypeText: {
-    color: '#e67e22',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9',
-    marginBottom: 8,
-  },
+    typeText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      fontWeight: '600',
+    },
+    selectedTypeText: {
+      color: colors.accent,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: colors.borderMuted,
+      borderRadius: 12,
+      padding: 16,
+      fontSize: 16,
+      backgroundColor: colors.inputBackground,
+      marginBottom: 8,
+    },
   textArea: {
     minHeight: 80,
     textAlignVertical: 'top',
@@ -1109,38 +1148,38 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 8,
   },
-  validationText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-  },
+    validationText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
   modalActions: {
     flexDirection: 'row',
     gap: 12,
     marginTop: 24,
   },
-  cancelButton: {
-    flex: 1,
-    backgroundColor: '#f0f0f0',
-    padding: 18,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    color: '#666',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  saveButton: {
-    flex: 1,
-    backgroundColor: '#e67e22',
-    padding: 18,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  saveButtonDisabled: {
-    backgroundColor: '#ccc',
-  },
+    cancelButton: {
+      flex: 1,
+      backgroundColor: colors.surfaceMuted,
+      padding: 18,
+      borderRadius: 12,
+      alignItems: 'center',
+    },
+    cancelButtonText: {
+      color: colors.textSecondary,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    saveButton: {
+      flex: 1,
+      backgroundColor: colors.accent,
+      padding: 18,
+      borderRadius: 12,
+      alignItems: 'center',
+    },
+    saveButtonDisabled: {
+      backgroundColor: colors.borderMuted,
+    },
   saveButtonText: {
     color: 'white',
     fontSize: 16,

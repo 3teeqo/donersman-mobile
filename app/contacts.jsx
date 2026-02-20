@@ -1,6 +1,6 @@
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   Alert,
   Animated,
@@ -12,8 +12,11 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { useAppTheme } from '../contexts/AppThemeContext';
 
 const Contacts = () => {
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
@@ -37,17 +40,17 @@ const Contacts = () => {
   }, []);
 
   const contactInfo = {
-    phone: '+970 599 324 988',
-    email: 'donerHabibi@example.com',
-    address: 'Döner Street 5, StephenPlatz, Vienna City',
+    phone: '+970 599000000',
+    email: 'donersman@example.com',
+    address: 'Al-Sa\'a Roundabout, Ramallah',
     hours: {
       weekdays: '10:00 AM - 11:00 PM',
       weekends: '10:00 AM - 12:00 AM'
     },
     social: {
-      facebook: 'DönerHabibi',
-      instagram: '@doner_habibi',
-      twitter: '@DonerHabibi'
+      facebook: 'DönersMan',
+      instagram: '@donersman',
+      twitter: '@DonersMan'
     }
   };
 
@@ -204,10 +207,10 @@ const Contacts = () => {
             
             <TouchableOpacity 
               style={styles.socialButton}
-              onPress={() => handleSocialPress('Twitter')}
+              onPress={() => handleSocialPress('Twitter "X"') }
             >
               <Text style={styles.socialIcon}>🐦</Text>
-              <Text style={styles.socialText}>Twitter</Text>
+              <Text style={styles.socialText}>Twitter "X" </Text>
               <Text style={styles.socialHandle}>{contactInfo.social.twitter}</Text>
             </TouchableOpacity>
           </View>
@@ -220,7 +223,7 @@ const Contacts = () => {
             <View style={styles.faqItem}>
               <Text style={styles.faqQuestion}>What are your delivery areas?</Text>
               <Text style={styles.faqAnswer}>
-                We deliver throughout Nablus and surrounding areas. Delivery fee may vary by location.
+                We deliver throughout Ramallah and surrounding areas. Delivery fee may vary by location.
               </Text>
             </View>
             
@@ -285,47 +288,47 @@ const Contacts = () => {
       )}
     </Animated.View>
   )
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff4e6',
-  },
+  }
+  
+const createStyles = (colors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
   scrollView: {
     flex: 1,
   },
-  header: {
-    padding: 24,
-    paddingTop: 80,
-    backgroundColor: '#ffcc80',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#7d2e14',
-    marginBottom: 8,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: '#7d2e14',
-    opacity: 0.8,
-  },
+    header: {
+      padding: 24,
+      paddingTop: 80,
+      backgroundColor: colors.heroBackground,
+      alignItems: 'center',
+    },
+    headerTitle: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      color: colors.textPrimary,
+      marginBottom: 8,
+    },
+    headerSubtitle: {
+      fontSize: 16,
+      color: colors.textSecondary,
+    },
   section: {
     margin: 20,
     marginTop: 24,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
-  },
-  contactItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
+    sectionTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.textPrimary,
+      marginBottom: 16,
+    },
+    contactItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
     padding: 20,
     borderRadius: 16,
     marginBottom: 12,
@@ -342,208 +345,208 @@ const styles = StyleSheet.create({
   contactDetails: {
     flex: 1,
   },
-  contactTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  contactValue: {
-    fontSize: 16,
-    color: '#666',
-  },
+    contactTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: 4,
+    },
+    contactValue: {
+      fontSize: 16,
+      color: colors.textSecondary,
+    },
   copyButton: {
     padding: 8,
   },
-  copyIcon: {
-    fontSize: 18,
-    color: '#666',
-  },
-  hoursCard: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 16,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
+    copyIcon: {
+      fontSize: 18,
+      color: colors.textSecondary,
+    },
+    hoursCard: {
+      backgroundColor: colors.surface,
+      padding: 20,
+      borderRadius: 16,
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
   hourItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  hourDays: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  hourTime: {
-    fontSize: 16,
-    color: '#e67e22',
-    fontWeight: '600',
-  },
-  hourSeparator: {
-    height: 1,
-    backgroundColor: '#f0f0f0',
-    marginVertical: 12,
-  },
-  hoursNote: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 12,
-    fontStyle: 'italic',
-  },
+    hourDays: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.textPrimary,
+    },
+    hourTime: {
+      fontSize: 16,
+      color: colors.accent,
+      fontWeight: '600',
+    },
+    hourSeparator: {
+      height: 1,
+      backgroundColor: colors.borderMuted,
+      marginVertical: 12,
+    },
+    hoursNote: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginTop: 12,
+      fontStyle: 'italic',
+    },
   socialContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  socialButton: {
-    alignItems: 'center',
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 16,
-    flex: 1,
-    marginHorizontal: 6,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
+    socialButton: {
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      padding: 16,
+      borderRadius: 16,
+      flex: 1,
+      marginHorizontal: 6,
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
   socialIcon: {
     fontSize: 24,
     marginBottom: 8,
   },
-  socialText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  socialHandle: {
-    fontSize: 12,
-    color: '#666',
-  },
-  faqContainer: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    overflow: 'hidden',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  faqItem: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  faqQuestion: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  faqAnswer: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-  },
-  emergencyCard: {
-    backgroundColor: '#fff8f0',
-    padding: 20,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: '#e67e22',
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
+    socialText: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: 4,
+    },
+    socialHandle: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    faqContainer: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      overflow: 'hidden',
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
+    faqItem: {
+      padding: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.borderMuted,
+    },
+    faqQuestion: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: 8,
+    },
+    faqAnswer: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+    emergencyCard: {
+      backgroundColor: colors.accentSoft,
+      padding: 20,
+      borderRadius: 16,
+      borderWidth: 2,
+      borderColor: colors.accent,
+      alignItems: 'center',
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
   emergencyIcon: {
     fontSize: 32,
     marginBottom: 12,
   },
-  emergencyTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  emergencyText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 20,
-  },
-  emergencyButton: {
-    backgroundColor: '#e67e22',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  emergencyButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  feedbackCard: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 16,
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  feedbackText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 20,
-  },
-  feedbackButton: {
-    backgroundColor: '#e67e22',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  feedbackButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+    emergencyTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.textPrimary,
+      marginBottom: 8,
+    },
+    emergencyText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: 16,
+      lineHeight: 20,
+    },
+    emergencyButton: {
+      backgroundColor: colors.accent,
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      borderRadius: 12,
+    },
+    emergencyButtonText: {
+      color: colors.accentText,
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    feedbackCard: {
+      backgroundColor: colors.surface,
+      padding: 20,
+      borderRadius: 16,
+      alignItems: 'center',
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
+    feedbackText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: 16,
+      lineHeight: 20,
+    },
+    feedbackButton: {
+      backgroundColor: colors.accent,
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      borderRadius: 12,
+    },
+    feedbackButtonText: {
+      color: colors.accentText,
+      fontSize: 16,
+      fontWeight: '600',
+    },
   footerSpacer: {
     height: 40,
   },
-  copiedIndicator: {
-    position: 'absolute',
-    bottom: 20,
-    alignSelf: 'center',
-    backgroundColor: '#4CAF50',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 20,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  copiedText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
-  },
+    copiedIndicator: {
+      position: 'absolute',
+      bottom: 20,
+      alignSelf: 'center',
+      backgroundColor: colors.accent,
+      paddingHorizontal: 20,
+      paddingVertical: 12,
+      borderRadius: 20,
+      elevation: 4,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+    },
+    copiedText: {
+      color: colors.accentText,
+      fontSize: 14,
+      fontWeight: '600',
+    },
 })
 
 export default Contacts
