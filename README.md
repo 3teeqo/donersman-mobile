@@ -1,4 +1,9 @@
-# Welcome to your Expo app 👋
+DonersMan is built with Expo-cli,
+Following are the steps for running it for the first time.
+
+"Splash screen" or "Loading screen" can be changed from app.json file, as well as the name of the project.
+
+# Welcome to this Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
