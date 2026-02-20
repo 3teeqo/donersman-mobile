@@ -5,7 +5,7 @@ DönersMan, a product‑level mobile application that started as a random idea d
 • Persistent cart with full session recovery
 • Multiple saved delivery addresses + use current location (GPS)
 • Loyalty & reviews for customer engagement
-• One-tap contact actions (call, email, open in maps – Al-Sa’a Roundabout)
+• One-tap contact actions (call, email, open in maps)
 • Fully consistent light/dark theme
 
 #DonersMan is built with Expo-cli.
